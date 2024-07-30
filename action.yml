@@ -8,13 +8,7 @@ branding:
   color: "green"
 inputs:
   auth:
-    description: "Your secret with the gist scope"
-    required: true
-  gistID:
-    description: "The ID of the gist to use"
-    required: true
-  filename:
-    description: "The *.json or *.svg filename of the badge data"
+    description: "Your secret token"
     required: true
   label:
     description: "The left text of the badge"
@@ -23,13 +17,9 @@ inputs:
     description: "The right text of the badge"
     required: true
   host:
-    description: "The base URL of the gist API"
-    default: "https://api.github.com/gists/"
-    required: false
-  forceUpdate:
-    description: "If set to true, the gist will be updated even if the content did not change"
-    default: "false"
-    required: false
+    description: "The base URL of the badgestor API"
+    default: "https://badges.mydomain.com/"
+    required: true
   labelColor:
     description: "The left color of the badge"
     required: false

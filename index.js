@@ -9,34 +9,47 @@
 import core from "@actions/core";
 import { makeBadge } from "badge-maker";
 
-const gistUrl = new URL(core.getInput("gistID"), core.getInput("host"));
+const hostUrl = new URL(core.getInput("host"));
 
 // This uses the method above to update a gist with the given data. The user agent is
 // required as defined in https://developer.github.com/v3/#user-agent-required
-async function updateGist(body) {
+async function updateBadge(body) {
   const headers = new Headers([
     ["Content-Type", "application/json"],
     ["Content-Length", new TextEncoder().encode(body).length],
-    ["User-Agent", "Schneegans"],
-    ["Authorization", `token ${core.getInput("auth")}`],
+    ["User-Agent", "gitea-dynamic-badges"],
+    ["x-api-key", `${core.getInput("auth")}`],
   ]);
 
-  const response = await fetch(gistUrl, {
+  let response = await fetch(hostUrl, {
     method: "POST",
     headers,
     body,
   });
 
   if (!response.ok) {
-    core.setFailed(
-      `Failed to create gist, response status code: ${response.status} ${response.statusText}`
-    );
-
-    return;
+    console.log(`Fetching badge failed: ${response.status} ${response.statusText}`);
+    if (response.status === 409) {
+      // This means likely the badge already exists.  Try to patch
+      response = await fetch(hostUrl, {
+        method: 'PATCH',
+        headers,
+        body,
+      });
+      if (!response.ok) {
+        core.setFailed(
+          `Failed to create gist, response status code: ${response.status} ${response.statusText}`
+        );
+    
+    
+        return;
+    }
+    }
   }
 
   console.log("Success!");
 }
+
 
 // We wrap the entire action in a try / catch block so we can set it to "failed" if
 // something goes wrong.
@@ -147,64 +160,12 @@ try {
   if (isSvgFile) {
     content = makeBadge(data);
   } else {
-    content = JSON.stringify(data);
+    content = JSON.stringify({ payload: { data } });
   }
 
-  // For the POST request, the above content is set as file contents for the
-  // given filename.
-  const body = JSON.stringify({ files: { [filename]: { content } } });
 
-  // If "forceUpdate" is set to true, we can simply update the gist. If not, we have to
-  // get the gist data and compare it to the new value before.
-  if (core.getBooleanInput("forceUpdate")) {
-    updateGist(body);
-  } else {
-    // Get the old gist.
-    fetch(gistUrl, {
-      method: "GET",
-      headers: new Headers([
-        ["Content-Type", "application/json"],
-        ["User-Agent", "Schneegans"],
-        ["Authorization", `token ${core.getInput("auth")}`],
-      ]),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return Promise.reject(
-            `Failed to get gist: ${response.status} ${response.statusText}`
-          );
-        }
-
-        return response.json();
-      })
-      .then((oldGist) => {
-        let shouldUpdate = true;
-
-        if (oldGist?.files?.[filename]) {
-          const oldContent = oldGist.files[filename].content;
-
-          if (oldContent === content) {
-            console.log(
-              `Content did not change, not updating gist at ${filename}.`
-            );
-            shouldUpdate = false;
-          }
-        }
-
-        if (shouldUpdate) {
-          if (oldGist?.files?.[filename]) {
-            console.log(`Content changed, updating gist at ${filename}.`);
-          } else {
-            console.log(`Content didn't exist, creating gist at ${filename}.`);
-          }
-
-          updateGist(body);
-        }
-      })
-      .catch((error) => {
-        core.setFailed(error);
-      });
-  }
+  updateBadge(content);
+  
 } catch (error) {
   core.setFailed(error);
 }
