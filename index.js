@@ -8,6 +8,8 @@
 
 import core from "@actions/core";
 import { makeBadge } from "badge-maker";
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
 const util = require('util');
 
