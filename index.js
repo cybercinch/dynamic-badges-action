@@ -157,7 +157,7 @@ try {
 
   let content = "";
 
-  content = JSON.stringify({ payload: { data } });
+  content = JSON.stringify({ payload: data });
 
   console.log("Body of request: %s", content);
 
