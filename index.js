@@ -32,6 +32,7 @@ async function updateBadge(body) {
   });
 
   if (!response.ok) {
+    console.log("Returned: %j", response.body);
     console.log(`Fetching badge failed: ${console.log(util.inspect(response, false, null, true /* enable colors */))}`);
     if (response.status === 409) {
       // This means likely the badge already exists.  Try to patch
