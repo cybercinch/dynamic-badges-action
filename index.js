@@ -118,27 +118,27 @@ try {
     data.labelColor = labelColor;
   }
 
-  if (!isSvgFile && isError != "") {
+  if (isError != "") {
     data.isError = isError;
   }
 
-  if (!isSvgFile && namedLogo != "") {
+  if (namedLogo != "") {
     data.namedLogo = namedLogo;
   }
 
-  if (!isSvgFile && logoSvg != "") {
+  if (logoSvg != "") {
     data.logoSvg = logoSvg;
   }
 
-  if (!isSvgFile && logoColor != "") {
+  if (logoColor != "") {
     data.logoColor = logoColor;
   }
 
-  if (!isSvgFile && logoWidth != "") {
+  if (logoWidth != "") {
     data.logoWidth = parseInt(logoWidth);
   }
 
-  if (!isSvgFile && logoPosition != "") {
+  if (logoPosition != "") {
     data.logoPosition = logoPosition;
   }
 
@@ -146,18 +146,13 @@ try {
     data.style = style;
   }
 
-  if (!isSvgFile && cacheSeconds != "") {
+  if (cacheSeconds != "") {
     data.cacheSeconds = parseInt(cacheSeconds);
   }
 
   let content = "";
 
-  if (isSvgFile) {
-    content = makeBadge(data);
-  } else {
-    content = JSON.stringify({ payload: { data } });
-  }
-
+  content = JSON.stringify({ payload: { data } });
 
   updateBadge(content);
   
