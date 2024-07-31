@@ -9,7 +9,7 @@
 import core from "@actions/core";
 import { makeBadge } from "badge-maker";
 
-const util = require('util')
+const util = require('util');
 
 const hostUrl = new URL(core.getInput("host"));
 
