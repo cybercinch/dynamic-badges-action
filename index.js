@@ -25,7 +25,9 @@ async function updateBadge(body) {
     ["x-api-key", `${core.getInput("auth")}`],
   ]);
 
-  let response = await fetch(hostUrl, {
+  console.log("Making post request to: %s", hostUrl);
+
+  const response = await fetch(hostUrl, {
     method: "POST",
     headers,
     body,
@@ -33,15 +35,15 @@ async function updateBadge(body) {
 
   if (!response.ok) {
     console.log("Returned: %j", response.body);
-    console.log(`Fetching badge failed: ${console.log(util.inspect(response, false, null, true /* enable colors */))}`);
     if (response.status === 409) {
       // This means likely the badge already exists.  Try to patch
-      response = await fetch(hostUrl, {
+      console.log("Running patch on %s", hostUrl);
+      response2 = await fetch(hostUrl, {
         method: 'PATCH',
         headers,
         body,
       });
-      if (!response.ok) {
+      if (!response2.ok) {
         core.setFailed(
           `Failed to create gist, response status code: ${response.status} ${response.statusText}`
         );
