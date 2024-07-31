@@ -28,7 +28,7 @@ async function updateBadge(body) {
   });
 
   if (!response.ok) {
-    console.log(`Fetching badge failed: ${response.status} ${response.statusText}`);
+    console.log(`Fetching badge failed: ${response}`);
     if (response.status === 409) {
       // This means likely the badge already exists.  Try to patch
       response = await fetch(hostUrl, {
