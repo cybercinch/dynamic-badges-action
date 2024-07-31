@@ -159,6 +159,8 @@ try {
 
   content = JSON.stringify({ payload: { data } });
 
+  console.log("Body of request: %s", content);
+
   updateBadge(content);
   
 } catch (error) {
